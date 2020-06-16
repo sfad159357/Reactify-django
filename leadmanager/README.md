@@ -51,4 +51,19 @@ serializer，能將複雜的data像是qurey sets和model instances轉換成pytho
 
 用post，記得http://localhost:8080/api/leads/，最後面要記得加/。
 
+## 補充: IDE小問題
+
+code在api.py的Lead底下出現紅頗浪線，訊息：Class 'Lead' has no 'objects' member。在vs code底下的setting.json物件內新增:
+>"python.linting.pylintArgs": [
+        "--load-plugins=pylint_django"
+   ]
+
+
+
+# 建立前端app
+
+>python manage.py startapp frontend
+
+
+
 

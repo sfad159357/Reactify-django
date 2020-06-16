@@ -1,0 +1,6 @@
+node_modules
+
+# django
+
+__pycache__
+db.sqlite3
