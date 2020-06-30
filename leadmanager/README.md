@@ -11,7 +11,7 @@
 
 > pipenv shell，在自己的資料夾創建 pipfile。會直接在你的 folder 底下創建虛擬環境。
 
-> pipenv install django djangorestframework django-rest-knox
+> p pipenv install django djangorestframework django-rest-knox
 
 安裝這三個項目，最後一項是用來 django 做驗證。安裝完後，會將這個項目的套件自動更新在 pipfile。同時也創建 pipfile.lock，底下有紀錄其套件在版本中的依賴性。
 
@@ -42,7 +42,9 @@ serializer，能將複雜的 data 像是 qurey sets 和 model instances 轉換�
 
 # error1:That port is already in use.
 
-當我要 runserver，跳出Ｅ rror:That port is already in use.的訊息，因為http://127.0.0.1:8000/，這個網址原本是我上一個django專案的網址，所以port需要改成不一樣，或是要把原本的port砍掉。
+當我要 runserver，跳出 error:That port is already in use.的訊息，因為http://127.0.0.1:8000/
+
+這個網址原本是我上一個 django 專案的網址，所以 port 需要改成不一樣，或是要把原本的 port 砍掉。
 
 我用 port8080 來更換，python manage.py runserver 8080 來變更
 
@@ -50,7 +52,9 @@ serializer，能將複雜的 data 像是 qurey sets 和 model instances 轉換�
 
 用 postman 測試 get，應該會跑出個[]，但是卻跑出一堆 html 程式碼，原來在 leadmanager.urls 底下的 urlpatterns 中，path('', include(leads.urls))要放在第一個索引，這樣 lead 的 prls.py 中 router.urls 才能夠順利附加上去/api/leads。
 
-用 post，記得http://localhost:8080/api/leads/，最後面要記得加/。
+用 post，記得http://localhost:8080/api/leads/
+
+最後面要記得加/。
 
 ## 補充: IDE 小問題
 
@@ -171,3 +175,53 @@ Dashboard，儀表板。用來展現其他 js 的狀態，屬於功能組件 fun
 ## 安裝擴充套件：Prettier-Code formatter
 
 到 vs code 的 settings，搜尋 format on save，將選項勾選，這樣排版跑掉的，一旦 cmd+s 後就可以自動幫忙排版。
+
+## 備註：重開起 IDE，記得要重啟虛擬環境
+
+> pipenv shell
+
+()裡面是要你的專案資料夾
+
+可能會沒反應，就要重安裝套件
+
+> pipenv install django djangorestframework django-rest-knox
+
+好了，之後就能夠 runserver 了
+
+## 安裝 google 擴充套件：Redux DevTools
+
+# 開發 redux
+
+安裝 redux 和 react-redux 套件：
+
+> npm i redux react_redux
+
+安裝 redux-thunk，是一種 middleware，可以從 action 發出異的請求。
+
+> npm i redux-thunk
+
+安裝 redux-devtools-extension
+
+> npm i redux-devtools-extension
+
+applyMiddleware 來自於 redux-thunk
+
+## 小插曲 2
+
+在 App.js 輸入完<Provider>後，然後重新整理頁面，頁面內容變空白，控制台底下跳出 error:Cannot read property 'shape' of undefined。在 redux dev tool 也看不到 store。
+
+答案：要安裝 react-redux@5.0.6 ，是版本問題，導致 Provider 無法新增 store 到 props 中
+
+> npm i react-redux@5.0.6
+
+## 安裝產生 HTTP method 請求的套件
+
+> npm i axios
+
+# Redux 有一半搞不懂在幹嘛，大部分按照教程帶過
+
+# postman 在 api 輸入 post 的 error
+
+在終端機出現 django.db.utils.IntegrityError，後來才發現我在 model 刪掉沒有用到的 field，沒有馬上進行 makemigrations 和 migrate，做完之後就能夠 post 了
+
+# 處理 error，下載第三方套件叫 react alert
