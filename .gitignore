@@ -1,6 +1,8 @@
 node_modules
 
 # django
-
+leadmanager/__pycache__
 __pycache__
 db.sqlite3
+*.pyc
+npm

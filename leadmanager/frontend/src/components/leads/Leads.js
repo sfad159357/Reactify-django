@@ -12,7 +12,7 @@ export class Leads extends Component {
     deleteLead: PropTypes.func.isRequired,
   };
 
-  // 當Leads component生命週期到了component時，就會呼叫Leads的props的方法
+  // 當Leads component生命週期到了did mount時，就會呼叫Leads的props的方法
   componentDidMount() {
     this.props.getLeads();
   }

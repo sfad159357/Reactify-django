@@ -31,6 +31,12 @@ export class Form extends Component {
     const { name, email, message } = this.state; // 等效於name = this.state.name; {email} = this.state.email
     const lead = { name, email, message }; // {name, email, message}等效於{name: name, email:email, message:message}，就會形成我們所要lead的物件
     this.props.addLead(lead); // 啟動addLead方法，輸入所創建好lead物件作為參數
+    this.setState({
+      // 當按下submit後，我們要將state裡的value清空，代表輸入框的字元都被清空
+      name: "",
+      email: "",
+      message: "",
+    });
   };
 
   // 邏輯：有form輸入框->設定onChange->能夠在框內輸入字元->觸發onChange定義的this.onChange方法->創造state物件儲存key和value->input內的值是來自於state內的value

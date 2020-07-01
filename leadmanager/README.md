@@ -218,10 +218,49 @@ applyMiddleware 來自於 redux-thunk
 
 > npm i axios
 
-# Redux 有一半搞不懂在幹嘛，大部分按照教程帶過
+# Redux 略懂而已，大部分按照教程帶過
 
 # postman 在 api 輸入 post 的 error
 
 在終端機出現 django.db.utils.IntegrityError，後來才發現我在 model 刪掉沒有用到的 field，沒有馬上進行 makemigrations 和 migrate，做完之後就能夠 post 了
 
-# 處理 error，下載第三方套件叫 react alert
+# 處理 error
+
+處理 error，就是當輸入訊息不 valid 時，在網頁上會跳出 error 視窗，而不是單只有在 console.log 出現。我們要做的事跟處理 leads 很像，如果有 error 因為被觸發事件而產生，這會首先在 leadsActions 在 addlead 時附帶去產生的 error 訊息，一樣要進行 dispatch 發送，由 errorReducer 進行屬於 error state 的宣告，並進行將 error data 儲存於 state 中，也就是 state.errorReducer。
+
+然後在 Alerts component 一樣透過 redux 負責將 state 放在 store 中，跟 Leads component 一樣將 state 轉化成 props，透過 connect 將 redux 中的 state 和 Alerts 連結起來。
+
+當網頁進入生命週期 did mount 或 did update 被觸發時，觸發 Alerts props 當中的 alert.xxx()方法，這是 Alerts import withAlert 來的方法。另外， 已經將 state 投映成 props 中的 error,props.error，用 if 條件式來區分 error 中不同的 msg，來警示不同的文字訊息。
+
+# 下載第三方套件
+
+> npm i react-alert react-alert-template-basic react-transition-group
+
+所在前端頁面輸入的 data，包含 error data，先辨識是何種 action 型態，是 get,post 還 delete?然後透過 reducer 來做 state 增添刪減，有點算是後台做 data 儲存，只是 redux 是用來分辨 state 哪些 data 進行增添和刪減。
+
+如此一來，我們要隨之變動的前端頁面的組件 component，不管是 Leads 還是 errors 呈現，都是透過儲存在 state 中的 data 去撈，state 裡是什麼隨之而呈現什麼。由於 redux 的 state 中，裡頭有完整的 state，但是 redux 可以顯示 Diff，也就是只顯示有變更的 state。讓頁面重新的載入不用全部 state 都要編譯呈現，而是只要重新編譯更改過的部位，在效能上可以減少不必要的浪費。
+
+# error:connect 和 withAlert
+
+在 Alert.js 中，在 export default withAlert()(Alerts)要加上 connect，看底下網友留言用"export default connect(mapStateToProps)(withAlert()(Alerts))"，但是 console.log 噴出錯誤 Invaration Violation:You must pass a component to the function returned by connect. Instead received {}.用原作者的方法也不行。
+
+後來要用 compose()來合併解決。
+
+> import { compose } form 'redux';
+
+> export default compose(withAlert(),connect(mapStateToProps))(Alerts)
+
+用 compose 先將 withAlert()和 connect(mapStateToProps)合併在一起，最後才加上自己的 component (Alerts)。
+
+compose()也稱為巢狀函式，()包裹的是函式，從右邊的函式的回傳值作為左邊函式的參數，如此一來，此函式又產生回傳值，做為更左邊函式的參數。
+
+我認為 connect()和要輸出的 component Alerts 沒關係，要 connect 的是 mapStateToprops，然後也要輸出。
+
+# 處理 add 後 error 的 alert，接下來處理 add 和 delete 成功後的 alert
+
+在 reducer 新增新 file，messagesReducer。
+操作方法跟 errorsReducer 類似，可以先複製裡面的內容進行修改。
+
+在 actions 新增 file，messagesAction。
+
+這裡的邏輯也是很像，定義 type 的名稱->定義 messagesAction 中的 createMessage(msg)函式->leadsAction 順便 dispatch createMessage(msg)，這 msg 就是我們想要跳出現的文字訊息->messagesReducer(要被 combined)->messagesReducer 的 state 改變->在 Alert 組件將 state 投映 map 成 props->在 compoentDidUpdate 因 props 改變而被觸發->定義函式，將 state 裡的 msg 拿出來 alert.show()
