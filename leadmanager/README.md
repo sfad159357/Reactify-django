@@ -263,4 +263,102 @@ compose()也稱為巢狀函式，()包裹的是函式，從右邊的函式的回
 
 在 actions 新增 file，messagesAction。
 
-這裡的邏輯也是很像，定義 type 的名稱->定義 messagesAction 中的 createMessage(msg)函式->leadsAction 順便 dispatch createMessage(msg)，這 msg 就是我們想要跳出現的文字訊息->messagesReducer(要被 combined)->messagesReducer 的 state 改變->在 Alert 組件將 state 投映 map 成 props->在 compoentDidUpdate 因 props 改變而被觸發->定義函式，將 state 裡的 msg 拿出來 alert.show()
+這裡的邏輯也是很像，定義 type 的名稱->定義 messagesAction 中的 createMessage(msg)函式->leadsAction 順便 dispatch createMessage(msg)，這 msg 就是我們想要跳出現的文字訊息->messagesReducer(要被 combined)->messagesReducer 的 state 改變->在 Alert 組件將 state 投映 map 成 props->在 compoentDidUpdate 因 props 改變而被觸發->定義函式，將 state 裡的 msg 拿出來 alert.success()
+
+# part5:django token authentication
+
+我們想要新增 login 帳號，才能進行 delete 和 create 和 update。
+
+重新回到 project leadmanager，/leadmannger/leads/models.py。
+
+從 django 的模組調用 User
+
+> from django.contrib.auth.models import User
+
+新稱 owner model，然後 makemigrations 和 migrate
+
+到 leads/api.py
+
+更改底下 LeadViewSet 的參數 queryset
+
+並且修改 permissions
+
+> permissions.IsAuthenticated
+
+這時候進入網頁時，終端機和 console 就會噴 403，底下的 lead 物件都看不到
+
+我們想要將 403 的 error 訊息儲存到 state 中，並且 alert error 出來，所以暫回到前端 coding
+
+在 messageAction 新增 returnErrors 並輸出，type 使用 GET_ERROR
+
+在 leadsAction 改掉 addLead 底下 error 處理，改用函式 returnErrors 替換，這樣就不用看到一大串的 code，在維護上面可以直接到 messageAction 的 returnErrors 修改就好。除了 addLead 的 err 處理以外，getLead 也是
+
+改完之後，err 的訊息就會被儲存在 state，而 state 會被放在 redux 的 store 中
+
+# register User
+
+接下來要創建 register API，而能註冊使用者，註冊後我們會提供 login API，一旦我們登入進去會給予 token，這 token 會傳送到 headers，使有權限能夠 getLeads 和 addLeads。
+
+接下來，要使用到已經安裝好的套件 django-rest-knox
+
+到 leadmanager/settings.py，到 installed_apps 新增'knox'。
+
+新增 REST_FRAMEWORK = { ... }。
+
+之後要進行 migrate 的操作。
+
+接下來要對於建立 user 和註冊 logging 來創建 serializers，我們不想要再 leads 這原有的 app 建立，而是另外創建 app 叫 accounts 帳戶，startapp 後一樣要到 installed_apps 新增。
+
+# coding accounts
+
+新增 serializers.py
+
+首先先 focus 在 register 上，然後再搞定 logging，這裡會用 postman 來測試
+
+新增 api.py，coding 後新增 endpoint，最後要到 leadmanager 的 urls.py 去 include
+
+接下來，就用 postman 測試。
+
+結果，噴 500 error，TypeError: 'type' object is not iterable
+
+到 settings.py 的 REST_FRAMEWORK 在(xxx,)後面要多加一個,，因為輸入的是一個 tuple，若沒輸入,會被視為單一的值包()而已，就會被視為 string。
+
+在 postman post 成功後，會得到回傳的 data，一個 user 的 data，另一個是 token，代表我們已經完成了 register 的流程。
+
+接下來，就要進入到 login 登入的流程。
+
+回到 serializers.py 新增 LoginSerializer，再來就是 api.py 新增 login 的部分
+
+# 備註：user1 和 user2 後面的數字沒有什麼關係，只想區分不同的變數
+
+# 儲存 user 在 database 是否成功
+
+由於在 serializers.py 的 RegisterSerializer，裡面方法 create()我不小心放在 class Meta 底下，正確放的位置是是 class RegisterSerializer 底下。
+
+所以，雖然也可以在 postman 透過 HTTP post 在我的 RegisterAPI 進行 post 來去將參數，也就是傳過來的物件 request 裡的 data，首先進行取得列器，再來將序列器進行驗證 valid，驗證符合格式就 save()到 database。
+
+然而，因為我在 RegisterSerializer 的 create()方法放錯 class，導致沒有實際做 create()的動作。真正創建 user 這物件，要帶入已驗證的 data，將 data 的 value 值 create 成 User 物件，這個過程會將密碼雜湊化。所以沒有經過 create()的，並沒有將密碼給雜湊化。
+
+所以，透過 HTTP post request 物件進到 LoginAPI 進行驗證?還是進到 LoginSerializer 的 validate 驗證?這邊我還不是很懂。我猜想 LoginAPI 的 serializer.is_valid()應該看使用者輸入的格式是否空白，或是輸入非英文數字，而在 LoginSerializer 的 validate()中 authenticate()方法，才是主要去辨認 username 和經過雜湊的 password，若符合 database 中的 data，就會回傳此物件；若不符合這跳出 ValidError。
+
+# 小 error：AttributeError
+
+在上面的程序都符合後，一樣 login，但卻跳出 500，error 訊息 AttributeError: 'function' object has no attribute 'context'。後來我將 UserSerializer()內的 context=self.get_serializer_context()此屬性刪掉，就 ok 了。
+
+# 存取 User
+
+coding UserAPI，然後增加 endpoint。
+
+在 postman 用 HTTP get 去存取 User，得到 401，{ "detail": "Authentication credentials were not provided."
+}
+
+所以，要存取特定的 user，就要使用到那 User 的 token。
+
+在 postman 的 Header 的 key 增加 Authorization 授權，並在 value 中輸入 token "金鑰密碼"
+
+# 登出
+
+在 urls.py 新增 logout endpoint，在 postman 使用 post，在 Header 輸入 login 後的 token， 就可以登出，回傳 204，no content 但請求成功。這時再用一樣的 token 去 get User，會被回傳 401，Unauthorized 未授權。也就是之前 login 回傳舊的 token 已無法使用，要重新 login 一次，才能夠到新的 token 去 get User。
+
+knox_views.LogoutView 的登出機制就是，使無法驗證 token，我們將這舊的 token 破壞，所以只能再次登入才能夠得到 token。
+有些人的做法是清除前端的 local storage，但這並不是真正的登出，因為登入的 token 一樣可以使用。

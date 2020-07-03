@@ -41,8 +41,17 @@ INSTALLED_APPS = [
     'leads',
     'rest_framework',
     'frontend',
-    
+    'knox',
+    'accounts'
 ]
+
+# 設置authentication選項
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES':
+    # 這是一個tuple，如果只有一個值後面要加上,，不然會被系統當作單一的值包上()
+    ('knox.auth.TokenAuthentication',)
+
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

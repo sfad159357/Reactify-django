@@ -1,7 +1,7 @@
 import axios from "axios";
 
-import { GET_LEADS, DELETE_LEAD, ADD_LEAD, GET_ERRORS } from "./types";
-import { createMessage } from "./messagesAction";
+import { GET_LEADS, DELETE_LEAD, ADD_LEAD } from "./types";
+import { createMessage, returnErrors } from "./messagesAction";
 
 // get leads
 export const getLeads = () => (dispatch) => {
@@ -15,7 +15,10 @@ export const getLeads = () => (dispatch) => {
         payload: res.data, // 從server回應回來的data，也是和type一樣，將response回來的data儲存在action中payload傳送到leadsReducer的函式內
       });
     })
-    .catch((err) => console.log(err)); // 基本上這裡也要有個errors reducer來傳送errors到component
+    .catch((err) =>
+      dispatch(returnErrors(err.response.data, err.response.status))
+    );
+  // 基本上這裡也要有個errors reducer來傳送errors到component
 };
 
 // delete leads
@@ -47,15 +50,20 @@ export const addLead = (lead) => (dispatch) => {
         payload: res.data,
       });
     })
-    .catch((err) => {
-      const errors = {
-        // 儲存在常數errors物件裡頭有message和status
-        msg: err.response.data, // msg示意物件形式儲存，{name:["xxx"], email:["yyy"]}
-        status: err.response.status,
-      };
-      dispatch({
-        type: GET_ERRORS,
-        payload: errors, // 發送到errorReducer，action.payload就是errors我們所定義的物件
-      });
-    });
+    .catch(
+      (err) =>
+        // 這個方法2跟上面createMessage({msg})一樣，輸入想要的參數就好
+        dispatch(returnErrors(err.response.data, error.response.status))
+
+      // 方法一換掉，我們直接另外在messagesAction設函式，取代下面的code
+      // const errors = {
+      //   // 儲存在常數errors物件裡頭有message和status
+      //   msg: err.response.data, // msg示意物件形式儲存，{name:["xxx"], email:["yyy"]}
+      //   status: err.response.status,
+      // };
+      // dispatch({
+      //   type: GET_ERRORS,
+      //   payload: errors, // 發送到errorReducer，action.payload就是errors我們所定義的物件
+      // });
+    );
 };
