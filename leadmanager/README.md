@@ -358,7 +358,61 @@ coding UserAPI，然後增加 endpoint。
 
 # 登出
 
-在 urls.py 新增 logout endpoint，在 postman 使用 post，在 Header 輸入 login 後的 token， 就可以登出，回傳 204，no content 但請求成功。這時再用一樣的 token 去 get User，會被回傳 401，Unauthorized 未授權。也就是之前 login 回傳舊的 token 已無法使用，要重新 login 一次，才能夠到新的 token 去 get User。
+在 urls.py 新增 logout endpoint，在 postman 使用 post，在 Header 輸入 login 後的 token， 就可以登出，回傳 204，no content 但請求成功。這時再用一樣的 token 去 get User，會被回傳 401，Unauthorized 未授權，。也就是之前 login 回傳舊的 token 已無法使用，回傳訊息{
+"detail": "Invalid token."
+}，要重新 login 一次，才能夠到新的 token 去 get User。
 
 knox_views.LogoutView 的登出機制就是，使無法驗證 token，我們將這舊的 token 破壞，所以只能再次登入才能夠得到 token。
 有些人的做法是清除前端的 local storage，但這並不是真正的登出，因為登入的 token 一樣可以使用。
+
+# 回到前端 component，針對認證和登入狀況進行 coding
+
+安裝 react route dom version4
+
+> npm i react-router-dom@4.3.1
+
+在 App.js 進行 import { BrowserRouter }
+
+一般來說，我們點了連結會載入到 login 頁面，但是當我們重新載入瀏覽器時，系統將會向 server 尋找叫做"login"的頁面，這是我們不希望發生的，為了避免這樣的狀況發生，可以去部署 patchy 補丁等。
+
+在這裡我們改 import {HashRouter}，另外 import {Route, Switch, Redirect } from 'react-route-dom'
+
+然後用<Router>將<Fragment>包起來
+
+# event.preventDefault()的概念
+
+event.preventDefault()，顧名思義就是事件產生了，預防預設行為，任何有 DOM 本身的功能都會取消。比如<a href="xxx" id="click">點擊其文字，他的 DOM 功能就是跳轉到連結頁面，但是如果只是想執行 onClick 點擊來觸發事件，不想要進入連結，就可以在 document.getElementById('click').onClick = (event) => { event.preventDefault() }，加入此方法來取消 DOM 預設行為。
+
+# 增加 Login 和 Register 兩 component
+
+分別在 components 的 accounts 的新增 Login.js 和 Register.js，所要做的事情跟 Form.js 很像，就是有輸入框要輸入，按 submit 按鈕。
+
+另外，在 Header 中加入此這兩個組件的 link，就能在 nav bar 右上角浮現 Register 和 Login 兩連結。然後 navbar 用<div classNmae='contaner'>包住。
+
+最後在 App.js 中，在<Switch>內使用<Route exact link="/xxx" component={yyy}>，使組件之間透過不同的 link 來作切換。
+
+# 新增 authReducer 加入到 Redux 底下的 state
+
+ 新增 authReducer，裡面創建初始 stateinnitialState={ token:localStorage.getItem("token"), isAuthenticated:null，isLoading:false, user:null
+}
+然後輸出函式，做法跟 leadReducer 很像，一樣進行對於 action.type 的 switch case。
+
+# 隱藏 Dashboard 組件
+
+我們並不想在還沒有登入的情況下，讓使用者一進首頁就看到 Dashboard 組件，也就是直接 Forms(Add Lead)和 Leads 組件。要用 private route。
+
+在 components 底下新增 folder "common"，其底下新增 file "PrivateRoute.js"。對於標準的 route，有點像是某種 proxy，但除了我們想去檢查 user 是否登入。
+
+PrivateRoute，是一種 functional component，其參數是一個物件，物件內首先參 1 是我們要隱藏的 component 就是 Dashboard，參 2 是從 Redux 中的 state 帶入的，參 3 是...rest。
+
+# 檢查 user 是否認證過
+
+我們想要去 check user 是否是 authenticated，如果有 token，我們取得 token 並發送 USER_LOADED action，如果沒有 token 則發送 GET_ERRORS action，回傳 error state，也就是 error message(ex:"Authentication credentials were not provided.")和 error status(ex:401)。
+
+另外，發送 AUTH_ERROR action。目的是要將 auth state 的狀態更新成初始狀態。
+
+而一開始的 action 都有個 USER_LOAING。
+
+最後在 App.js 中，透過生命週期 componentDidMount()去觸發，從 store 去 dispatch()函式 loadUser()。一旦載入到頁面，就觸發 loadUser()。
+
+可以在 Redux 的 Actions 中看到。
