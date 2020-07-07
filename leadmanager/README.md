@@ -211,7 +211,7 @@ applyMiddleware 來自於 redux-thunk
 
 ## 小插曲 2
 
-在 App.js 輸入完<Provider>後，然後重新整理頁面，頁面內容變空白，控制台底下跳出 error:Cannot read property 'shape' of undefined。在 redux dev tool 也看不到 store。
+在 App.js 輸入完\<Provider>後，然後重新整理頁面，頁面內容變空白，控制台底下跳出 error:Cannot read property 'shape' of undefined。在 redux dev tool 也看不到 store。
 
 答案：要安裝 react-redux@5.0.6 ，是版本問題，導致 Provider 無法新增 store 到 props 中
 
@@ -387,19 +387,19 @@ knox_views.LogoutView 的登出機制就是，使無法驗證 token，我們將�
 
 在這裡我們改 import {HashRouter}，另外 import {Route, Switch, Redirect } from 'react-route-dom'
 
-然後用<Router>將<Fragment>包起來
+然後用\<Router>將\<Fragment>包起來
 
 # event.preventDefault()的概念
 
-event.preventDefault()，顧名思義就是事件產生了，預防預設行為，任何有 DOM 本身的功能都會取消。比如<a href="xxx" id="click">點擊其文字，他的 DOM 功能就是跳轉到連結頁面，但是如果只是想執行 onClick 點擊來觸發事件，不想要進入連結，就可以在 document.getElementById('click').onClick = (event) => { event.preventDefault() }，加入此方法來取消 DOM 預設行為。
+event.preventDefault()，顧名思義就是事件產生了，預防預設行為，任何有 DOM 本身的功能都會取消。比如\<a href="xxx" id="click">點擊其文字，他的 DOM 功能就是跳轉到連結頁面，但是如果只是想執行 onClick 點擊來觸發事件，不想要進入連結，就可以在 document.getElementById('click').onClick = (event) => { event.preventDefault() }，加入此方法來取消 DOM 預設行為。
 
 # 增加 Login 和 Register 兩 component
 
 分別在 components 的 accounts 的新增 Login.js 和 Register.js，所要做的事情跟 Form.js 很像，就是有輸入框要輸入，按 submit 按鈕。
 
-另外，在 Header 中加入此這兩個組件的 link，就能在 nav bar 右上角浮現 Register 和 Login 兩連結。然後 navbar 用<div classNmae='contaner'>包住。
+另外，在 Header 中加入此這兩個組件的 link，就能在 nav bar 右上角浮現 Register 和 Login 兩連結。然後 navbar 用\<div classNmae='contaner'>包住。
 
-最後在 App.js 中，在<Switch>內使用<Route exact link="/xxx" component={yyy}>，使組件之間透過不同的 link 來作切換。
+最後在 App.js 中，在\<Switch>內使用\<Route exact link="/xxx" component={yyy}>，使組件之間透過不同的 link 來作切換。
 
 # 新增 authReducer 加入到 Redux 底下的 state
 
@@ -439,7 +439,7 @@ PrivateRoute，是一種 functional component，其參數是一個物件，物�
 
 觸發 login()這 action 後會進行 tpyes 和 payload 的發送，會由 authReducer 去分辨 action 的類型進行 switch case，重新包裝整理 payload 資料，重新回傳新的 state 到 Redux 上。
 
-Redux 分辨哪些是更新後的 state，再經由 Login 這 component 中 render()函式，帶入條件式(this.isAuthenticatedProp)，也就是 Redux 將更新後的 state 掛載 Login 組件的 props 上，透過 props 的變更，去觸發重新導向 Dashboard 頁面的動作<Redirect to="/" />，這種方式和網頁生命週期的 componentDidMount()很像，但是後者是先 props 更新，才觸發 componentDidMount()掛載組件。前者則是在 render()下條件被觸發，進行條件式。
+Redux 分辨哪些是更新後的 state，再經由 Login 這 component 中 render()函式，帶入條件式(this.isAuthenticatedProp)，也就是 Redux 將更新後的 state 掛載 Login 組件的 props 上，透過 props 的變更，去觸發重新導向 Dashboard 頁面的動作\<Redirect to="/" />，這種方式和網頁生命週期的 componentDidMount()很像，但是後者是先 props 更新，才觸發 componentDidMount()掛載組件。前者則是在 render()下條件被觸發，進行條件式。
 
 # 反推回去
 
@@ -491,7 +491,7 @@ loadUser()就不會發送 USER_LOADED，改 catch 到 error，然後發送 GER_E
 # 新增 logout() action
 
 這裡面的 code 基本上和 loadUser()或 login()很類似，就不贅述了。
-他的觸發條件是，在<button onClick={this.props.logout}>這邊要注意的是，在標籤內的變數{}中的函式不用去加()，我猜想是因為 onClick 本身是個觸發條件，觸發後就會主動去呼喚 logout，像是 onSubmit 也是。
+他的觸發條件是，在\<button onClick={this.props.logout}>這邊要注意的是，在標籤內的變數{}中的函式不用去加()，我猜想是因為 onClick 本身是個觸發條件，觸發後就會主動去呼喚 logout，像是 onSubmit 也是。
 
 最後，登出成功後，發送 action.type = LOGOUT_SUCCESS，將所有狀態設成 false, null，token 移除。同時後台也將 token 摧毀。
 
@@ -517,7 +517,7 @@ loadUser()就不會發送 USER_LOADED，改 catch 到 error，然後發送 GER_E
 
 另外，如果註冊 username 但已經註冊過了，也在 Alerts 附加 error.msg.username。
 
-註冊成功後，會回傳 200。而我們要直接跳轉到 Dashboard，做法跟 login 一樣，透過 connect，將 state.authReducer.isAutheticated 連結到 Redux，透過掛載到 Register 的 props，if 判斷 isAuthenticatedProp 為 true，回傳 component <Redirect to="/">，跳轉到 Dashboard。
+註冊成功後，會回傳 200。而我們要直接跳轉到 Dashboard，做法跟 login 一樣，透過 connect，將 state.authReducer.isAutheticated 連結到 Redux，透過掛載到 Register 的 props，if 判斷 isAuthenticatedProp 為 true，回傳 component \<Redirect to="/">，跳轉到 Dashboard。
 
 # 解決 leads 授權的問題
 
