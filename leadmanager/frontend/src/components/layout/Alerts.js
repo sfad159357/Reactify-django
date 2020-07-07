@@ -26,11 +26,15 @@ export class Alerts extends Component {
         alert.error(`Name:${error.msg.name} `);
       if (error.msg.email) alert.error(`Email: ${error.msg.email}`);
       if (error.msg.message) alert.error(`Message: ${error.msg.message}`);
+      if (error.msg.non_field_errors) alert.error(error.msg.non_field_errors);
+      if (error.msg.username) alert.error(error.msg.username);
     }
+    // 當使用者登入時輸入不對的帳密，Redux會出現non_field_errors
 
     if (message !== previousProps.message) {
       if (message.leadDeleted) alert.success(message.leadDeleted);
       if (message.leadAdded) alert.success(message.leadAdded);
+      if (message.passwordNotMatch) alert.error(message.passwordNotMatch);
     }
   }
 

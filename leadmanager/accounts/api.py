@@ -22,7 +22,7 @@ class RegisterAPI(generics.GenericAPIView):
             # serialized user
             "user": UserSerializer(user1, context=self.get_serializer_context()).data,
             # 為指定user創造屬於他的token，當從前端做request，將會透過token來知道你是誰，然後這token將會進入到header，在header內進入到authorization授權
-            # "token": token
+            "token": token
         })
 
 

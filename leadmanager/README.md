@@ -1,5 +1,8 @@
-開始日期：06/15
+開始日期：2020/06/15
+結束日期：2020/07/07
 影片網址：https://www.youtube.com/watch?v=Uyei2iDA4Hs
+教程主題：Full Stack React & Django
+教程作者：Traversy Media
 
 # 安裝套件
 
@@ -325,7 +328,14 @@ compose()也稱為巢狀函式，()包裹的是函式，從右邊的函式的回
 
 在 postman post 成功後，會得到回傳的 data，一個 user 的 data，另一個是 token，代表我們已經完成了 register 的流程。
 
+Register 流程：
+postman POST (headers, body)-> RegisterAPI -> data serializer 化 -> serializer 驗證後.save() -> 使用者資訊註冊在後台的 db。
+
+# loginAPI
+
 接下來，就要進入到 login 登入的流程。
+
+這裡跟 registerAPI 很像，只差在 registerAPI 有 save()這個存 data 的動作。透過 loginAPI 主要要獲得 user 的 data，以及透過取得 token 來分辨 state 中是否有 authenticated。透過 true，來導入可存取的頁面。
 
 回到 serializers.py 新增 LoginSerializer，再來就是 api.py 新增 login 的部分
 
@@ -360,10 +370,10 @@ coding UserAPI，然後增加 endpoint。
 
 在 urls.py 新增 logout endpoint，在 postman 使用 post，在 Header 輸入 login 後的 token， 就可以登出，回傳 204，no content 但請求成功。這時再用一樣的 token 去 get User，會被回傳 401，Unauthorized 未授權，。也就是之前 login 回傳舊的 token 已無法使用，回傳訊息{
 "detail": "Invalid token."
-}，要重新 login 一次，才能夠到新的 token 去 get User。
+}，要重新 login 一次，才能夠拿到新的 token 去 get User。
 
-knox_views.LogoutView 的登出機制就是，使無法驗證 token，我們將這舊的 token 破壞，所以只能再次登入才能夠得到 token。
-有些人的做法是清除前端的 local storage，但這並不是真正的登出，因為登入的 token 一樣可以使用。
+knox_views.LogoutView 的登出機制就是，使無法驗證 token，我們將這舊的 token 破壞，或是說改變當初 LoginAPI 設定的 token，你所持有舊的 token 將對照不起來，而取消授權，所以只能再次登入才能夠得到新的 token。
+有些人的做法是清除前端的 local storage，但這並不是真正的登出，因為只要重新輸入原本登入的 token，一樣可以使用。
 
 # 回到前端 component，針對認證和登入狀況進行 coding
 
@@ -416,3 +426,104 @@ PrivateRoute，是一種 functional component，其參數是一個物件，物�
 最後在 App.js 中，透過生命週期 componentDidMount()去觸發，從 store 去 dispatch()函式 loadUser()。一旦載入到頁面，就觸發 loadUser()。
 
 可以在 Redux 的 Actions 中看到。
+
+# 進行 login
+
+在 authAction 中，新增函式新增 login()，其參數 username, password。另外，要帶入前端提交到後台的格式，如 config 中的 headrs 和 body，前者是內容型態 application/json，後者是要帶入的字串化 JSON，也就是我們所輸入的參數包成 JSON 後字串化。
+
+再來就是透過 axios 使用 post HTTP 方法經由 urls 到我們所提供的 api:"api/auth/login"，這才是真正 login 的動作，在 api 中的 LoginAPI 進行名稱和密碼的驗證，如果合格，就會回應經由序列化 User 的 data 得到 user 和從 knox 模組中的 AuthToken 取得 token，{"user", "token"}
+
+得到參數 res，發送 LOGIN_SUCCESS 狀態，也發送 res.data。如果接收到錯誤，發送 GET_ERROR(400，"Incorrect Credentials")和 LOGIN_FAIL 狀態(因為使用者名稱和密碼驗證不過，拿不到 token，isAuthticated = false，無法順利進去 PrivateRoute 的 Dashboard)
+
+ 然後在 Login component 調用 login()，然後將 state map to props，將兩者透過 connect 連結到 Redux 內的 state。透過 login 這個按鈕的 submit 互叫 this.props.login()來觸發 login 行為。
+
+觸發 login()這 action 後會進行 tpyes 和 payload 的發送，會由 authReducer 去分辨 action 的類型進行 switch case，重新包裝整理 payload 資料，重新回傳新的 state 到 Redux 上。
+
+Redux 分辨哪些是更新後的 state，再經由 Login 這 component 中 render()函式，帶入條件式(this.isAuthenticatedProp)，也就是 Redux 將更新後的 state 掛載 Login 組件的 props 上，透過 props 的變更，去觸發重新導向 Dashboard 頁面的動作<Redirect to="/" />，這種方式和網頁生命週期的 componentDidMount()很像，但是後者是先 props 更新，才觸發 componentDidMount()掛載組件。前者則是在 render()下條件被觸發，進行條件式。
+
+# 反推回去
+
+至於 isAuthticatedProps(state.authReducer.isAuthenticated)在哪個地方時就被轉換成 true 呢？
+
+state 狀態是前端處理，在 authReducer 就回傳 true，是由於得到的 action.type === LOGIN_SUCCESS。
+
+至於為什麼 authAction 的 login()能發送出登入成功的 type?
+
+是由於成功得到 response，否則就是得到 catch error。
+
+從哪裡來得到的 response 呢?
+
+login()函式內的 axios.post()發送 headers 內 Content_Type、body 中的使用者名稱和密碼經由"api/auth/login"路徑，傳送至我們設定的 LoginAPI 內，這傳送的 data 就是 request 的 data。經由序列化後，進行驗證，驗證合格後，就會 Response 回應指定 user 的 data 和專屬於此 user 的 token。
+
+# 登出後的機制
+
+能在 LoginAPI 得到 token 代表，state.authReducer.isAuthenticated = true，透過此條件式，讓我們能夠順利進去 Dashboard 此私人路徑。如果要登出，就要在 postman 輸入路徑"api.auth/logout"，方法 post，並且要輸入此 user 的 token，才能夠順利登出，回傳 204。
+
+由於我還沒設計登出時跳轉回去 Login 頁面，所以我必須手動重新整理頁面，由於後台對照 token 的值被 logout()給改變，就算持有原本的 token 也無效。當重新導向"/"時，首先會呼叫 App 中的 loadUser()這個 action，會發送原本的 token 及 headers 的參數經由"api/auth/user"進入 UserAPI。如果要存取 User 內的物件是要 Authenticated，表示要對照 token。但由於 db 內部的 token 被 knox 模組的 LogoutView()改變，拿舊有的 token 就對照不起來，此時就 get 不到 user 物件。
+
+loadUser()就不會發送 USER_LOADED，改 catch 到 error，然後發送 GER_ERROR 和 AUTH_ERROR，此時 authReducer 就同時接收到這兩個 type，前者回傳 error status(401)和 error message("detail": "Authentication credentials were not provided.")；後者就會將 state.authReducer 重置 null 跟 false 狀態，isAuthenticated = false，導致無法進入 PrivateRoute 的 Dashboard，跳轉至 Login 頁面。
+
+# Diff 的差異
+
+這邊有個小細節：重新導向後，authState 的 Diff，並非從登入後 isAuthenticated:true 變成登出後 isAuthenticated:false，而是又會重新跑流程一遍，也就是從起始 initialState 的 isAuthenticated:null，驗證 user 不過， 在 AUTH_ERROR 被設置為 isAuthenticated:false。
+
+# 沒登出的 reload
+
+而 token 在 initialState 中是再次去取得原本的 token，起始值並沒有設定為 null，這代表沒有登出後的重新導向，isAuthticated 雖然被初始化成 null，但後台的 token 的值並沒有改變，一樣能夠在 UserAPI 對照起來，所以 loadUser()就會發送 USER_LOADED type 的 action，因為 USER_LOAED 的 type，在 authReducer 中 isAuthenticated 被設置成 true，所以 Diff 中 isAuthenticated:null -> true，user 也是從 null -> {id:xx, username:'yyy',... }。
+
+# LOGIN_SUCCESS 和 USER_LOADED 還是會 GET_ERRORS
+
+在成功登入後和重新導向後順利載入 USER，還是會跳出 GET_ERROR，{401,"Authentication credentials were not provided."}。
+發現這個 error 是從 api/leads/而來。所以判斷這個 GET_ERROR 是從 leadsAction 的 getLead()發送的，原因是當初在設定 Leads 的 API，LeadViewSet，要做 Leads 的物件的存取，也有個 permissions，必須要 isAuthenticated = True 才行。
+
+透過取得 LoginAPI 或 RegisterAPI 得到 Response，action.type 就會傳遞 LOGIN_SUCCESS 或 REGISTER_SUCCESS，回傳新的 state，透過 isAuthenticated 轉 true，進行一開始進入頁面的授權，使用者身份就被允許進入到 Dashboard 此頁面。實際並沒有傳遞 token 這動作，來取得授權。
+
+然而，get,add,delete leads 的存取需要授權。這些授權必須再經由後端的認證才能夠對後台的 database 進行資料的存取。這個時候真的需要傳遞 token，來進行驗證，驗證通過得到授權。這個步驟留到最後在新增。
+
+# 登入後隱藏 Register 和 Login
+
+因為已經登入了，我們要將 Header 右上角 Register 和 Login 連結隱藏，在 render()函式內宣告常數 authLink 和 guestLink，authLink 是登入後右上角顯示出按鈕 Logout，而 guestLink 顯示 Register 和 Login，透過條件式，判斷 isAuthenticated，來決定顯示哪個連結。
+
+# 註記:PropTypes
+
+由於 javasrcipt 是若型別，在編輯時不會跳出錯誤，而是在編譯時會跳出錯誤。PropTypes 是用來輔助開發的工具，我們將 props 附加上型別，如果我們輸入的型別有誤，在 console 就會顯示出錯誤
+
+# 新增 logout() action
+
+這裡面的 code 基本上和 loadUser()或 login()很類似，就不贅述了。
+他的觸發條件是，在<button onClick={this.props.logout}>這邊要注意的是，在標籤內的變數{}中的函式不用去加()，我猜想是因為 onClick 本身是個觸發條件，觸發後就會主動去呼喚 logout，像是 onSubmit 也是。
+
+最後，登出成功後，發送 action.type = LOGOUT_SUCCESS，將所有狀態設成 false, null，token 移除。同時後台也將 token 摧毀。
+
+# 登入錯誤，alert 提醒
+
+在登入時，輸入不對的帳密，在 console 會丟出 400 bad request，"Incorrect Credentials"，而在 Redux 的 Action 會顯示 LOGIN_FAIL，但是使用者都看不見，需要用 alert 提醒使用者。
+
+在 Alerts component 新增 if 條件式，登入錯誤時 error.msg.non_field_errors 多出這個字串屬性。
+
+特別開創個 Alerts component 有個好處，就是 alerts 集中管理，不需要在需要的 component 到處設 alert，而且還從 Redux 撈 error state 的 data 上來，轉換成訊息。
+
+# 登入成功，顯示使用者名稱
+
+我們可以使用 Header 的 authLink，在右上角顯示 username。
+
+# 實作註冊 Register 功能
+
+在 authAction 新增 register()，基本上和 login 大同小異。
+
+在 authReducer，REGISTER 型態的 case 也是和 LOGIN 型態一樣，
+
+首先，在 Register 中的 onSubmit 進行 password 和 password2 檢查是否相等，若不相等 createMessage，製造訊息物件，然後在 Alerts 內，透過訊息是否出現作為判斷式，來 alert error。
+
+另外，如果註冊 username 但已經註冊過了，也在 Alerts 附加 error.msg.username。
+
+註冊成功後，會回傳 200。而我們要直接跳轉到 Dashboard，做法跟 login 一樣，透過 connect，將 state.authReducer.isAutheticated 連結到 Redux，透過掛載到 Register 的 props，if 判斷 isAuthenticatedProp 為 true，回傳 component <Redirect to="/">，跳轉到 Dashboard。
+
+# 解決 leads 授權的問題
+
+其實很簡單，問題在於存取 leads，並沒有在 axios 帶入 headers,token 的 config，沒有 token，就一樣無法 get, delete, post 等 HTTP 方式存取 leads。所以調用 tokenConfig 並帶入到 axios。要注意的是，getLeads, deleteLeads, addLeads 函式中裡參數除了有帶入 dispatch 方法，還有 getState 方法。在 tokenConfig()內要帶入 getState，要透過 getState 來取得 state 中 authReducer 的 token。
+有了 token，就可以被授權存取 leads。
+
+透過 knox 此模組來管理 token，我們能夠透過 token，就都能夠存取 permission.isAuthenticated。
+
+# 結束

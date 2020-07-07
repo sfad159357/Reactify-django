@@ -1,5 +1,9 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
+import { connect } from "react-redux";
+import { register } from "../../actions/authAction";
+import PropTypes from "prop-types";
+import { createMessage } from "../../actions/messagesAction";
 
 export class Register extends Component {
   state = {
@@ -9,17 +13,21 @@ export class Register extends Component {
     password2: "", // double check
   };
 
+  static propTypes = {
+    isAuthenticatedProp: PropTypes.bool,
+    register: PropTypes.func.isRequired,
+  };
+
   onSubmit = (event) => {
     event.preventDefault();
+    // 這裡check密碼是否相同，若不相同製造訊息出來，訊息是以物件形式呈現
+    // 這是我們在輸入框輸入的值
     const { username, email, password, password2 } = this.state;
-    const account = { username, email, password, password2 };
-    this.props.registerAction(account);
-    this.setState({
-      username: "",
-      email: "",
-      password: "",
-      password2: "",
-    });
+    if (password !== password2)
+      this.props.createMessage({
+        passwordNotMatch: "password do not match",
+      });
+    else this.props.register(username, password, email);
   };
 
   onChange = (event) => {
@@ -30,6 +38,7 @@ export class Register extends Component {
   };
 
   render() {
+    if (this.props.isAuthenticatedProp) return <Redirect to="/" />;
     const { username, email, password, password2 } = this.state;
     return (
       <div className="col-md-6 mu-auto">
@@ -93,4 +102,8 @@ export class Register extends Component {
   }
 }
 
-export default Register;
+const mapStateToProps = (state) => ({
+  isAuthenticatedProp: state.authReducer.isAuthenticated,
+});
+
+export default connect(mapStateToProps, { register, createMessage })(Register);

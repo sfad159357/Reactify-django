@@ -2,11 +2,12 @@ import axios from "axios";
 
 import { GET_LEADS, DELETE_LEAD, ADD_LEAD } from "./types";
 import { createMessage, returnErrors } from "./messagesAction";
+import { tokenConfig } from "./authAction";
 
 // get leads
-export const getLeads = () => (dispatch) => {
+export const getLeads = () => (dispatch, getState) => {
   axios
-    .get("/api/leads/") // 製造HTTP GET請求
+    .get("/api/leads/", tokenConfig(getState)) // 製造HTTP GET請求
     .then((res) => {
       // 會回傳promise回來，會回傳res的參數
       dispatch({
@@ -23,9 +24,9 @@ export const getLeads = () => (dispatch) => {
 
 // delete leads
 // 新增參數id
-export const deleteLead = (id) => (dispatch) => {
+export const deleteLead = (id) => (dispatch, getState) => {
   axios
-    .delete(`/api/leads/${id}/`)
+    .delete(`/api/leads/${id}/`, tokenConfig(getState))
     .then((res) => {
       // 如果只有一個dispatch()但發送不同兩個物件的話，會只發送第一個，所以這裡要重複兩次dispatch
       dispatch(createMessage({ leadDeleted: "Lead Deleted" }));
@@ -39,9 +40,9 @@ export const deleteLead = (id) => (dispatch) => {
 
 // add lead
 // 新增參數lead物件
-export const addLead = (lead) => (dispatch) => {
+export const addLead = (lead) => (dispatch, getState) => {
   axios
-    .post("/api/leads/", lead) // 這裏參2要帶入lead物件，就好像在postman要輸入物件key和value一樣
+    .post("/api/leads/", lead, tokenConfig(getState)) // 這裏參2要帶入lead物件，就好像在postman要輸入物件key和value一樣
     .then((res) => {
       // 若不是error，就會成功回應response
       dispatch(createMessage({ leadAdded: "Lead Added" }));
@@ -53,7 +54,7 @@ export const addLead = (lead) => (dispatch) => {
     .catch(
       (err) =>
         // 這個方法2跟上面createMessage({msg})一樣，輸入想要的參數就好
-        dispatch(returnErrors(err.response.data, error.response.status))
+        dispatch(returnErrors(err.response.data, err.response.status))
 
       // 方法一換掉，我們直接另外在messagesAction設函式，取代下面的code
       // const errors = {
