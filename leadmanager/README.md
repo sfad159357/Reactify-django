@@ -527,3 +527,33 @@ loadUser()就不會發送 USER_LOADED，改 catch 到 error，然後發送 GER_E
 透過 knox 此模組來管理 token，我們能夠透過 token，就都能夠存取 permission.isAuthenticated。
 
 # 結束
+
+# 後續：串接 MySQL
+
+參考自：https://www.youtube.com/watch?v=0IKuKk8ubf0
+影片主題：Django 如何連結 MySQL (docker) - PART 1
+影片作者：沈弘哲
+
+安裝 PyMySQL 這個 Library，請執行以下指令
+
+> pip install PyMySQL
+
+PyMySQL 版本：0.9.3
+
+以及 mysqlclient 這個 Library，請執行以下指令
+
+> pip install mysqlclient
+
+mysqlcient: 2.0.1
+
+# docker -> mysql root password:
+
+123456
+
+# 重開 vs code 記得重新建立虛擬環境
+
+> pipenv shell
+
+# 在 setting 改完 mysql 前，要安裝 mysqlclient
+
+> pipenv install mysqlclient
