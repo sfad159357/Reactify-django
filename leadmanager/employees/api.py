@@ -1,20 +1,17 @@
-from .models import Lead
 from rest_framework import viewsets, permissions
-from .serializers import LeadSerializer
+from .serializers import EmployeeSerializer
 
 
-class LeadViewSet(viewsets.ModelViewSet):
+class EmployeeViewSet(viewsets.ModelViewSet):
 
     permission_classes = [
-
         permissions.IsAuthenticated
-
     ]
 
-    serializer_class = LeadSerializer
+    serializer_class = EmployeeSerializer
 
     def get_queryset(self):
-        return self.request.user.leads.all()
+        return self.request.user.employees.all()
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

@@ -10,7 +10,7 @@ export class Register extends Component {
     username: "",
     email: "",
     password: "",
-    password2: "", // double check
+    password2: "",
   };
 
   static propTypes = {
@@ -20,8 +20,7 @@ export class Register extends Component {
 
   onSubmit = (event) => {
     event.preventDefault();
-    // 這裡check密碼是否相同，若不相同製造訊息出來，訊息是以物件形式呈現
-    // 這是我們在輸入框輸入的值
+
     const { username, email, password, password2 } = this.state;
     if (password !== password2)
       this.props.createMessage({
@@ -32,7 +31,6 @@ export class Register extends Component {
 
   onChange = (event) => {
     this.setState({
-      // input name="xxx": 鍵入的值
       [event.target.name]: event.target.value,
     });
   };
@@ -70,7 +68,7 @@ export class Register extends Component {
             <div className="form-group">
               <label>Password</label>
               <input
-                type="text"
+                type="password"
                 className="form-control"
                 name="password"
                 onChange={this.onChange}
@@ -81,7 +79,7 @@ export class Register extends Component {
             <div className="form-group">
               <label>Comfirm Password</label>
               <input
-                type="text"
+                type="password"
                 className="form-control"
                 name="password2"
                 onChange={this.onChange}

@@ -1,6 +1,6 @@
 {
     "git.ignoreLimitWarning": true,
-    "python.pythonPath": "/Users/chieng-ming-yen/.local/share/virtualenvs/20200615_reactify_django-TLQNy2RE/bin/python",
+    "python.pythonPath": "/Users/chieng-ming-yen/.local/share/virtualenvs/repoB-w8wojeJJ/bin/python",
     "python.linting.pylintArgs": [
         "--load-plugins=pylint_django"
    ]
