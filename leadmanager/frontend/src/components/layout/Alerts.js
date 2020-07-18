@@ -15,22 +15,24 @@ export class Alerts extends Component {
   componentDidUpdate(previousProps) {
     const { error, alert, message, auth } = this.props;
     if (error !== previousProps.error) {
-      if (error.msg.name) alert.error(`Name:${error.msg.name} `);
-      if (error.msg.email) alert.error(`Email: ${error.msg.email}`);
-      if (error.msg.message) alert.error(`Message: ${error.msg.message}`);
-      if (error.msg.non_field_errors) alert.error(error.msg.non_field_errors);
+      if (error.msg.name) alert.error("請輸入姓名");
+      if (error.msg.gender) alert.error("請輸入性別");
+      if (error.msg.birth) alert.error("請輸入出生年月日");
+      if (error.msg.mobile) alert.error("手機號碼請輸入10位整數數字");
+      if (error.msg.email) alert.error("電子信箱已有人使用");
       if (error.msg.username) alert.error(error.msg.username);
       if (error.msg.password) {
         if (error.msg.password[0]) alert.error(error.msg.password[0]);
         if (error.msg.password[1]) alert.error(error.msg.password[1]);
         if (error.msg.password[2]) alert.error(error.msg.password[2]);
       }
+      if (error.msg.non_field_errors) alert.error(error.msg.non_field_errors);
     }
 
     if (message !== previousProps.message) {
-      if (message.leadDeleted) alert.success(message.leadDeleted);
-      if (message.leadAdded) alert.success(message.leadAdded);
-      if (message.passwordNotMatch) alert.error(message.passwordNotMatch);
+      if (message.leadDeleted) alert.success("順利刪除");
+      if (message.leadAdded) alert.success("順利新增");
+      if (message.passwordNotMatch) alert.error("密碼不相符，請重新輸入");
     }
 
     if (auth !== previousProps.auth) {

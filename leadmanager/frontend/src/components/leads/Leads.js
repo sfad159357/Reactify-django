@@ -17,29 +17,28 @@ export class Leads extends Component {
   render() {
     return (
       <Fragment>
-        <h2>Lead List</h2>
+        <h2>員工資訊列表</h2>
         <table className="table table-striped">
-          {}
           <thead>
-            {}
             <tr>
-              {}
-              <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Message</th>
+              <th>員工編號</th>
+              <th>姓名</th>
+              <th>性別</th>
+              <th>出生</th>
+              <th>手機號碼</th>
+              <th>電子信箱</th>
               <th />
             </tr>
           </thead>
-          {}
           <tbody>
             {this.props.leadsProps.map((lead) => (
               <tr key={lead.id}>
-                {}
                 <td>{lead.id}</td>
                 <td>{lead.name}</td>
+                <td>{lead.gender}</td>
+                <td>{lead.birth}</td>
+                <td>{lead.mobile}</td>
                 <td>{lead.email}</td>
-                <td>{lead.message}</td>
                 <td>
                   <button
                     onClick={this.props.deleteLead.bind(this, lead.id)}

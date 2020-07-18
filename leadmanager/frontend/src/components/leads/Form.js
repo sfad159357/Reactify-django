@@ -7,8 +7,10 @@ import { addLead } from "../../actions/leadsAction";
 export class Form extends Component {
   state = {
     name: "",
+    gender: "",
+    birth: "",
+    mobile: "",
     email: "",
-    message: "",
   };
 
   static propTypes = {
@@ -22,25 +24,27 @@ export class Form extends Component {
 
   onSubmit = (event) => {
     event.preventDefault();
-    const { name, email, message } = this.state;
-    const lead = { name, email, message };
+    const { name, gender, birth, mobile, email } = this.state;
+    const lead = { name, gender, birth, mobile, email };
     this.props.addLead(lead);
     this.setState({
       name: "",
+      gender: "",
+      birth: "",
+      mobile: "",
       email: "",
-      message: "",
     });
   };
 
   render() {
-    const { name, email, message } = this.state;
+    const { name, gender, birth, mobile, email } = this.state;
 
     return (
       <div className="card card-body mt-4 mb-4">
-        <h2>Add Lead Form</h2>
+        <h2>新增員工表單</h2>
         <form onSubmit={this.onSubmit}>
           <div className="form-group">
-            <label>Name</label>
+            <label>姓名</label>
             <input
               className="form-control"
               type="text"
@@ -49,8 +53,44 @@ export class Form extends Component {
               value={name}
             />
           </div>
+
           <div className="form-group">
-            <label>email</label>
+            <label>性別</label>
+            <select
+              className="form-control"
+              name="gender"
+              onChange={this.onChange}
+              value={gender}
+            >
+              <option value="">--</option>
+              <option value="男">男</option>
+              <option value="女">女</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>出生日期</label>
+            <input
+              className="form-control"
+              type="date"
+              max="9999-12-31"
+              name="birth"
+              onChange={this.onChange}
+              value={birth}
+            />
+          </div>
+          <div className="form-group">
+            <label>手機號碼</label>
+            <input
+              className="form-control"
+              type="text"
+              name="mobile"
+              onChange={this.onChange}
+              value={mobile}
+            />
+          </div>
+          <div className="form-group">
+            <label>電子信箱</label>
             <input
               className="form-control"
               type="email"
@@ -59,17 +99,7 @@ export class Form extends Component {
               value={email}
             />
           </div>
-          <div className="form-group">
-            <label>Message</label>
-            <textarea
-              className="form-control"
-              type="text"
-              name="message"
-              onChange={this.onChange}
-              value={message}
-            />
-          </div>
-          {}
+
           <button type="submit" className="btn btn-primary">
             Submit
           </button>
