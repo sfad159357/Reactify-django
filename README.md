@@ -4,9 +4,13 @@
 
 
 開始日期：2020/06/15
+
 結束日期：2020/07/07
+
 影片網址：https://www.youtube.com/watch?v=Uyei2iDA4Hs
+
 教程主題：Full Stack React & Django
+
 教程作者：Traversy Media
 
 ## 學習筆記
@@ -66,7 +70,7 @@ serializer，能將複雜的 data 像是 qurey sets 和 model instances 轉換�
 
 最後面要記得加/。
 
-###### 補充: IDE 小問題
+#### 補充: IDE 小問題
 
 code 在 api.py 的 Lead 底下出現紅頗浪線，訊息：Class 'Lead' has no 'objects' member。在 vs code 底下的 setting.json 物件內新增:
 
@@ -198,7 +202,7 @@ Dashboard，儀表板。用來展現其他 js 的狀態，屬於功能組件 fun
 
 好了，之後就能夠 runserver 了
 
-###### 安裝 google 擴充套件：Redux DevTools
+#### 安裝 google 擴充套件：Redux DevTools
 
 ### 開發 redux
 
@@ -224,11 +228,10 @@ applyMiddleware 來自於 redux-thunk
 
 > npm i react-redux@5.0.6
 
-###### 安裝產生 HTTP method 請求的套件
+#### 安裝產生 HTTP method 請求的套件
 
 > npm i axios
 
-### Redux 略懂而已，大部分按照教程帶過
 
 ### postman 在 api 輸入 post 的 error
 
@@ -358,7 +361,7 @@ postman POST (headers, body)-> RegisterAPI -> data serializer 化 -> serializer 
 
 所以，透過 HTTP post request 物件進到 LoginAPI 進行驗證?還是進到 LoginSerializer 的 validate 驗證?這邊我還不是很懂。我猜想 LoginAPI 的 serializer.is_valid()應該看使用者輸入的格式是否空白，或是輸入非英文數字，而在 LoginSerializer 的 validate()中 authenticate()方法，才是主要去辨認 username 和經過雜湊的 password，若符合 database 中的 data，就會回傳此物件；若不符合這跳出 ValidError。
 
-### 小 error：AttributeError
+### 小 error：AttributeError
 
 在上面的程序都符合後，一樣 login，但卻跳出 500，error 訊息 AttributeError: 'function' object has no attribute 'context'。後來我將 UserSerializer()內的 context=self.get_serializer_context()此屬性刪掉，就 ok 了。
 
@@ -410,7 +413,7 @@ event.preventDefault()，顧名思義就是事件產生了，預防預設行為�
 
 ### 新增 authReducer 加入到 Redux 底下的 state
 
- 新增 authReducer，裡面創建初始 stateinnitialState={ token:localStorage.getItem("token"), isAuthenticated:null，isLoading:false, user:null
+新增 authReducer，裡面創建初始 stateinnitialState={ token:localStorage.getItem("token"), isAuthenticated:null，isLoading:false, user:null
 }
 然後輸出函式，做法跟 leadReducer 很像，一樣進行對於 action.type 的 switch case。
 
@@ -440,9 +443,9 @@ PrivateRoute，是一種 functional component，其參數是一個物件，物�
 
 再來就是透過 axios 使用 post HTTP 方法經由 urls 到我們所提供的 api:"api/auth/login"，這才是真正 login 的動作，在 api 中的 LoginAPI 進行名稱和密碼的驗證，如果合格，就會回應經由序列化 User 的 data 得到 user 和從 knox 模組中的 AuthToken 取得 token，{"user", "token"}
 
-得到參數 res，發送 LOGIN_SUCCESS 狀態，也發送 res.data。如果接收到錯誤，發送 GET_ERROR(400，"Incorrect Credentials")和 LOGIN_FAIL 狀態(因為使用者名稱和密碼驗證不過，拿不到 token，isAuthticated = false，無法順利進去 PrivateRoute 的 Dashboard)
+得到參數 res，發送 LOGIN_SUCCESS 狀態，也發送 res.data。如果接收到錯誤，發送 GET_ERROR(400，"Incorrect Credentials")和 LOGIN_FAIL 狀態(因為使用者名稱和密碼驗證不過，拿不到 token，isAuthticated = false，無法順利進去 PrivateRoute 的 Dashboard)
 
- 然後在 Login component 調用 login()，然後將 state map to props，將兩者透過 connect 連結到 Redux 內的 state。透過 login 這個按鈕的 submit 互叫 this.props.login()來觸發 login 行為。
+然後在 Login component 調用 login()，然後將 state map to props，將兩者透過 connect 連結到 Redux 內的 state。透過 login 這個按鈕的 submit 互叫 this.props.login()來觸發 login 行為。
 
 觸發 login()這 action 後會進行 tpyes 和 payload 的發送，會由 authReducer 去分辨 action 的類型進行 switch case，重新包裝整理 payload 資料，重新回傳新的 state 到 Redux 上。
 
@@ -533,7 +536,7 @@ loadUser()就不會發送 USER_LOADED，改 catch 到 error，然後發送 GER_E
 
 透過 knox 此模組來管理 token，我們能夠透過 token，就都能夠存取 permission.isAuthenticated。
 
-### 結束
+## 結束
 
 ### 後續：串接 MySQL
 
