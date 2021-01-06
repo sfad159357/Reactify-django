@@ -53,7 +53,7 @@ serializer，能將複雜的 data 像是 qurey sets 和 model instances 轉換�
 
 # postman 測試
 
-用 postman 測試 get，應該會跑出個[]，但是卻跑出一堆 html 程式碼，原來在 leadmanager.urls 底下的 urlpatterns 中，path('', include(leads.urls))要放在第一個索引，這樣 lead 的 prls.py 中 router.urls 才能夠順利附加上去/api/leads。
+用 postman 測試 get，應該會跑出個[]，但是卻跑出一堆 html 程式碼，原來在 leadmanager.urls 底下的 urlpatterns 中，path('', include(leads.urls))要放在第一個索引，這樣 lead 的 urls.py 中 router.urls 才能夠順利附加上去/api/leads。
 
 用 post，記得http://localhost:8080/api/leads/
 
