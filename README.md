@@ -1,4 +1,4 @@
-# Login and Register System to manage employees
+# Employees Information Management Website
 
 已部署到herohu的線上網站：https://employee-web-app.herokuapp.com/
 
