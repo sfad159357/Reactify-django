@@ -1,7 +1,12 @@
 # Login and Register System to manage employees
 
-透過前端 React+後端 django 整合，結合redux，製作出簡單可註冊和登入，登入後有權限進行get,post,delete操作。
+已部署到herohu的線上網站：https://employee-web-app.herokuapp.com/
 
+並具備有資料庫的功能
+
+## 介紹
+
+網頁主題：透過前端 React+後端 django 整合，結合redux，製作出可註冊和登入，登入後有權限進行員工資料的get,post,delete操作。
 
 開始日期：2020/06/15
 
@@ -9,7 +14,7 @@
 
 影片網址：https://www.youtube.com/watch?v=Uyei2iDA4Hs
 
-教程主題：Full Stack React & Django
+教程主題：Full Stack React & Django[1]-[6]
 
 教程作者：Traversy Media
 
@@ -86,7 +91,7 @@ code 在 api.py 的 Lead 底下出現紅頗浪線，訊息：Class 'Lead' has no
 
 > python manage.py startapp frontend
 
- 新增資料夾
+新增資料夾
 
 > mkdir -p ./frontend/src/components
 
@@ -160,7 +165,9 @@ react-dom 負責展示我們的 app 到瀏覽器上。
 
 #### 小插曲
 
-輸入網址http://127.0.0.1:8080/跑看看，結果只有title有換成Lead Manager，但頁面卻沒有跑出 React App 文字。原來是我還沒把 template 中 DIR 設定好，我就去 npm run dev，output 會參考 template 的 index.html 作為 entry(我在 package.json 的 script 下設定的)，但是在 setting 路徑沒設定好，而 index.html 將 main.js 作為樣板標籤，所以頁面沒顯示出來。
+輸入網址http://127.0.0.1:8080/跑看看
+
+結果只有title有換成Lead Manager，但頁面卻沒有跑出 React App 文字。原來是我還沒把 template 中 DIR 設定好，我就去 npm run dev，output 會參考 template 的 index.html 作為 entry(我在 package.json 的 script 下設定的)，但是在 setting 路徑沒設定好，而 index.html 將 main.js 作為樣板標籤，所以頁面沒顯示出來。
 
 後來，重新設定 settings 樣板參考路徑，砍掉原本的 main.js，再 run 一次 npm run dev，這是 output 出來的 main.js 才是正確的。
 
@@ -174,7 +181,7 @@ react-dom 負責展示我們的 app 到瀏覽器上。
 
 重 run dev 後，重新導向網頁，發現頁面內容一樣是 React App，怎麼改都一樣。後來試試用別的 port 改 8087，終於產生新的頁面內容。
 
-如果再 package.json 的 scripts 下的 dev 那行 code：... development 新增--watch，就又變成動態監測你更改的內容，不用更改後一直要 npm run dev 了。
+如果再 package.json 的 scripts 下的 dev 那行 code：... development 新增--watch，就又變成動態監測你更改的內容，不用更改後一直要 npm run dev 了。
 
 ### 創建 leads 資料夾
 
@@ -363,7 +370,7 @@ postman POST (headers, body)-> RegisterAPI -> data serializer 化 -> serializer 
 
 ### 小 error：AttributeError
 
-在上面的程序都符合後，一樣 login，但卻跳出 500，error 訊息 AttributeError: 'function' object has no attribute 'context'。後來我將 UserSerializer()內的 context=self.get_serializer_context()此屬性刪掉，就 ok 了。
+在上面的程序都符合後，一樣 login，但卻跳出 500，error 訊息AttributeError: 'function' object has no attribute 'context'。後來我將 UserSerializer()內的 context=self.get_serializer_context()此屬性刪掉，就 ok 了。
 
 ### 存取 User
 
